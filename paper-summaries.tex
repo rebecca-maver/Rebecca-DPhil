@@ -1,0 +1,92 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{geometry}
+\geometry{a4paper, top=25mm, right=25mm, left=25mm, bottom=25mm}
+
+
+\begin{document}
+
+\begin{center}
+    \huge{On Structure Preservation in the Model Order Reduction of Dynamical Systems}
+\end{center}
+
+
+\vspace{2cm}
+
+\begin{center}
+    \textit{Symplectic Model Reduction of Hamiltonian Systems on Nonlinear Manifolds} \\
+    Patrick Buchfink, Silke Glas, Bernard Haasdonk \cite{buchfink2021}
+\end{center}
+
+There exists work which addresses model order reduction (MOR) on manifolds or symplectic model reduction for Hamiltonian systems. They compare their model to classical (non-)symplectic model reduction and to non-symplectic model reduction on manifolds. This paper combines both, using a projection technique they call `symplectic manifold Galerkin', which projects the Hamiltonian system onto a nonlinear symplectic trial manifold. In order to find such a trial manifold, they use a neural network known as a deep convolutional autoencoder (DCA), which minimises the linear combination of the dynamical system and a symplecticity constraint (like a physics-informed neural network). They find that manifold techniques attain lower projection errors than the projection error for the POD basis. Also, more than one-third of the runs did not converge for non-symplectic DCA's, emphasising the importance of structure preservation for the model. \newline
+
+Is there a better way to find these nonlinear symplectic trial manifolds? They ignore the additional cost of computing symplecticity loss (instead of the data loss alone) because this is part of the `training phase'. How much time does it actually add? Why should you ignore this if it's the novel part? Not entirely sure what they mean in Remark 1. Is the error in the Hamiltonian zero if the initial condition is part of the reduced system? How can the initial condition of the full system be part of the reduced system? When all the additional components are zero?
+
+
+\vspace{2cm}
+
+\begin{center}
+    \textit{Symplectic Model Order Reduction with Non-Orthonormal Bases} \\ 
+    Patrick Buchfink, Ashish Bhatt, Bernard Haasdonk  \cite{buchfink2019}
+\end{center}
+
+The novelty of this work is demonstrating that suboptimal solutions are produced by orthonormal symplectic reduced order bases, so they allow for non-orthogonality. This style of structure-preserving MOR for Hamiltonian systems is based on the classical projection-based 'Proper Orthogonal Decomposition'. The transposed projection matrix is the symplectic inverse of the symplectic ROB $W^T = V^+$. To that end, it is essentially a Petrov-Galerkin projection used in combination with a symplectic ROB. The `Proper Symplectic Decomposition' is proposed as a snapshot-based basis generation technique for symplectic reduced order bases. The idea is to derive the ROB from a minimisation problem, with the constraint that the basis is symplectic, rather than orthogonal. One way this basis is generated is through a PSD SVD-like decomposition, which takes a snapshot matrix and outputs a symplectic ROB. Developing the PSD is the biggest problem: current procedures restrict to a certain subset of symplectic matrices and derive an optimal solution for this subset, which might be globally suboptimal. \newline
+This paper uses the Navier-Lam\'{e} equations as a case study.
+
+
+\vspace{2cm}
+
+\begin{center}
+    \textit{Structure-preserving model reduction for mechanical systems} \\
+    Sanjay Lall, Petr Krysl, Jerrold E. Marsden \cite{lall2003}
+\end{center}
+
+This paper has been mentioned as a foundational text in some other references. It discusses the idea of applying reduced-order modelling techniques to the Lagrangian and Euler-Lagrange equations, rather than to the state-space equations directly. Rather than projecting dynamics onto the constraint manifold, the original Lagrangian is restricted to the constraint submanifold $Q_r$ to give the new Lagrangian $L|_{Q_r}$. This means the reduced dynamics can only evolve on a solution manifold which automatically has the desirable properties of a Lagrangian system. The difficulty lies in choosing the submanifold $Q_r$. They suggest doing this by embedding the configuration manifold into a higher-dimensional linear subspace, and then decomposing (presumably by eigenfunctions). A manifold embedding is a structure-preserving map which places a lower-dimensional space (a manifold) into a higher-dimensional space while maintaining key topological, geometric or local relationships. Having chosen some subspace $V_r \subset V$, we can construct $Q_r$ as their intersection. This paper is more exploratory, suggesting that this would be an ideal framework, but not going into great detail about feasibility or comparing results from numerical experiments. For example, restricting solutions to the wrong manifold $Q_r$ may result in a system that, while Lagrangian, may be inaccurate. We need to be more precise about what quantities we want to preserve and why.
+
+
+\vspace{2cm}
+
+\begin{center}
+    \textit{Preserving Lagrangian Structure in Nonlinear Model Reduction with Application to Structural Dynamics} \\
+    Kevin Carlberg, Ray Tuminaro, Paul Bloggs \cite{carlberg2015}
+\end{center}
+
+This paper builds on the ideas in the previous (Lall et. al. \cite{lall2003}) work. The key idea shared between both is that we perform Galerkin projection on the Euler-Lagrange equation, as opposed to the first-order state-space form (on which MOR is typically applied), so that the reduced-order model inherits a Lagrangian structure. This leads to more general (and perhaps more flexible) structure preservation, including energy conservation and symplectic time-evolution. The theory is for a broad range of problems, including nonlinearities and parameter dependence. The novelty is expressed by the graph in Figure 1 --- find so-called `reduced Lagrangian ingredients', approximate them for a given parameter, then apply the Euler-Lagrange equations to access reduced-order equations of motion. By waiting until the last step to apply Euler-Lagrange, we finish with a Lagrangian system. They have a list of mathematical objects which need to be satisfied to have a valid Lagrangian. Firstly, a configuration space. Then preservation of the positive (semi-) definiteness of the mass matrix, the potential energy function, and the dissipation function. Finally, that the reduced external force is compatible with the forced Euler-Lagrange equations (essentially restricting any external forces to be in the reduced cotangent space). \newline
+
+The first stage is still a projection onto a smaller configuration space via a dense matrix $V$. Applying this projection to the Euler-Lagrange equations preserves Lagrangian structure. Sections of the paper are then dedicated to algorithms to preserve symmetry and positive definiteness for parameter-dependent, potentially nonlinear systems. They present different methodologies which both involve solving a least squares problem. \newline
+
+The numerical experiments section is quite extensive and considers an elastic body. It seemed to be quite a stiff problem, as the non-structure-preserving techniques used to compare the authors' formulation mostly did not produce stable results (seen very clearly in the experiment with no damping). However, both comparison techniques seemed quite rudimentary, hyper-reduction techniques which throw a great deal away. The key question is that just because we have built a new Lagrangian system, we are still approximating each component, so it may not be accurate. Internally, energy and symplecticity are preserved, but does this matter if it is not the most accurate methodology? This may be the case---it is clear that ensuring methods have some structure can improve stability. This method should be compared to more recent techniques.
+
+
+\vspace{2cm}
+
+\begin{center}
+    \textit{Structure-Preserving Operator Learning} \\
+    Nacime Bouziani, Nicolas Boull\'e \cite{bouziani2024}
+\end{center}
+
+Operator learning uses observational data to approximate the solution operator $\mathcal{G}: \mathcal{U} \to \mathcal{V}$ governed by a PDE. This differs from traditional neural networks because we can map between infinite-dimensional function spaces. Although they are designed for continuous, infinite-dimensional function spaces, computers must still discretise them onto grids. This transition causes an inconsistency known as operator aliasing. In particular, structural properties at the continuous level, such as symmetries, boundary conditions or conservation laws, may not be preserved in the discretisation. The novelty of this work is that it attempts to inherit structure from finite element methods by combining it with an encoder-processor-decoder paradigm. This way, the FEM literature on structure preservation, conformity and error analysis can still be applied, but the actual solution of the PDE is a nonlinear neural network which uses data. You also have more control of the aliasing error, since it is related to the mesh size of your finite element grid. \newline
+
+The encoder maps an input function to its degrees of freedom in the finite element space $\mathcal{U}_h = \text{span}(\varphi_1, \ldots, \varphi_n)$, via a Galerkin projection. The decoder then maps the predicted degrees of freedom in $\mathcal{V}_h = \text{span}(\phi_1, \ldots, \phi_n)$ to the reconstructed solution $u(x) = \sum_{i=1}^m u_i \phi_i(x)$. The construction of the inputs and outputs in this way allows us to assume that, under a conforming FE space, the approximate solution is an element of the original infinite-dimensional space $\mathcal{V}$ (including inheriting the appropriate boundary conditions). This means they can define a more `traditional' approximation error estimate. It is only the processor phase that is learnable. The finite element map in the input stage defines a graph whose vertices correspond to the DOFs and where two vertices have an edge only if their corresponding basis functions have overlapping support, i.e. $E := \left\{(i,j), \int_\Omega \phi_i \phi_j \ dx \neq 0 \right\}$. \newline
+
+Another introduction is a multigrid-inspired processor, which uses a hierarchy of meshes and function spaces to jump between coarse and fine grids and smooth errors efficiently. \newline
+
+Numerical experiments compare the SPON methodologies (SPON and SPON-MG) to other neural networks. I think more comparison needs to be done, in particular to traditional FEMs. The relative error still seems quite high. They also discuss `zero-shot super resolution', which says you can evaluate the approximation on finer meshes than you trained on without changing the error. I'm still unclear on how useful this is (why would you want finer resolution without high accuracy?), but any trait which does not require retaining seems positive for a neural network. Maybe this could be useful for MOR? Since you essentially re-mesh without needing to retrain, you won't degrade the model.
+
+\newpage
+\bibliographystyle{plain}
+\begin{singlespace}
+\bibliography{references}
+\end{singlespace}
+
+
+
+\end{document}
